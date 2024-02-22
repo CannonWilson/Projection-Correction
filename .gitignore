@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyz
+*.pyw
+*.pyc
+*.pyo
+.pytest_cache
+
+# Virtual Environment
+venv/
+env/
+.vscode/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
