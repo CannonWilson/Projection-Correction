@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-def manual_perspective_transforms(actual_img, recorded_img, src_points):
+def manual_perspective_transform(actual_img, recorded_img, src_points):
     """
     Manually crop out a region in the recorded_img specified
     by src_points and resize it to match the shape of
@@ -28,50 +28,44 @@ def manual_perspective_transforms(actual_img, recorded_img, src_points):
 
     return warped_recorded
 
-# TODO: correct
-def transform_recorded_img(actual_img, recorded_img, threshold, use_edges = True, low_threshold=50, high_threshold = 150):
+def contour_perspective_transform(actual_img, recorded_img):
     """
-    Transform the recorded image to crop out the projected image and
-    resize and re-orient result to match the shape of the actual image.
-    Uses cv2's contours functionality to find the projector output 
-    in the recorded image. Docs: https://docs.opencv.org/3.4/d4/d73/tutorial_py_contours_begin.html
-    Applies thresholding to get binary image, and then detects contours.
-    
+    Transforms a recorded image into the shape of the
+    actual image by using OpenCV's contour detection to 
+    find the contour with the largest area. That area
+    is considered to be the projector image and gets
+    cropped and resized. This approach was found to 
+    be the best in notebooks/transform.ipynb.
+
     Parameters:
-        actual_img: numpy array for the actual image (true, what is from video feed)
-        recorded_img: numpy array for the recorded image with a projector image on a dark background
+        actual_img: cv2 image for actual image (true)
+        recorded_img: cv2 image for recorded image (from camera)
     
     Returns:
-        transformed_img: numpy array representing the transformed recorded image
+        transformed_img: cv2 image for projector image cropped out of recorded_img
+            and resized to shape of actual_img
     """
+    # Find edge map using Canny edge detection on slightly blurred gray image
+    gray_image = cv2.cvtColor(recorded_img, cv2.COLOR_RGB2GRAY)
+    blurred_gray = cv2.GaussianBlur(gray_image, (5, 5), 0)
+    edges = cv2.Canny(blurred_gray, 7, 21)
 
-    # Convert images to grayscale
-    actual_gray = cv2.cvtColor(actual_img, cv2.COLOR_RGB2GRAY)
-    recorded_gray = cv2.cvtColor(recorded_img, cv2.COLOR_RGB2GRAY)
+    # Apply dilation to close gaps in between object edges
+    kernel_dilation = np.ones((11, 11), np.uint8)
+    dilated_edges = cv2.dilate(edges, kernel_dilation, iterations=1)
 
-    # Convert recorded gray img to binary mask using thresholding
-    if use_edges:
-        recorded_blurred = cv2.GaussianBlur(recorded_gray, (3, 3), 0)
-        recorded_edges = cv2.Canny(recorded_blurred, low_threshold, high_threshold)
-        ret, thresh = cv2.threshold(recorded_gray, threshold, 255, cv2.THRESH_BINARY)
+    # Apply erosion to reduce noise and fine-tune object boundaries
+    kernel_erosion = np.ones((7, 7), np.uint8)
+    eroded_image = cv2.erode(dilated_edges, kernel_erosion, iterations=1)
 
-    else:
-        ret, thresh = cv2.threshold(recorded_gray, threshold, 255, cv2.THRESH_BINARY)
+    # Find largest contour by area (should be screen)
+    contours_edge, _ = cv2.findContours(eroded_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    largest_contour_edge = sorted(contours_edge, key=cv2.contourArea, reverse=True)[0]
 
-    # Use Hough Transform to detect rectangles
-    lines = cv2.HoughLines(thresh, 1, np.pi / 180, 100)
+    # Apply Douglas-Peucker algorithm to simplify the contour into a quadrilateral
+    epsilon = 0.02 * cv2.arcLength(largest_contour_edge, True)
+    approx_contour = cv2.approxPolyDP(largest_contour_edge, epsilon, True) # shape: (4,1,2)
+    found_contour = np.reshape(approx_contour, (4,2)).astype(np.float32)
 
-    # Assuming the largest rectangle is the region of interest (ROI)
-    largest_rectangle = max(lines, key=lambda x: cv2.contourArea(x))
-
-    # Create a mask for the ROI
-    mask = np.zeros_like(recorded_gray)
-    cv2.drawContours(mask, [largest_rectangle], 0, (255), thickness=cv2.FILLED)
-
-    # Crop the recorded image using the mask
-    cropped_recorded_img = cv2.bitwise_and(recorded_img, recorded_img, mask=mask)
-
-    # Resize the cropped image to match the shape of the actual image
-    transformed_img = cv2.resize(cropped_recorded_img, (actual_img.shape[1], actual_img.shape[0]))
-
-    return transformed_img
+    # Use the found contour (corner points) to shift the image
+    return manual_perspective_transform(actual_img, recorded_img, found_contour)
