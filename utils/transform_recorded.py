@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+from skimage.filters import threshold_otsu
 
 def manual_perspective_transform(actual_img, recorded_img, src_points):
     """
@@ -46,9 +47,11 @@ def contour_perspective_transform(actual_img, recorded_img):
             and resized to shape of actual_img
     """
     # Find edge map using Canny edge detection on slightly blurred gray image
+    # calculating threshold values based on median
     gray_image = cv2.cvtColor(recorded_img, cv2.COLOR_RGB2GRAY)
     blurred_gray = cv2.GaussianBlur(gray_image, (5, 5), 0)
-    edges = cv2.Canny(blurred_gray, 7, 21)
+    threshold = threshold_otsu(blurred_gray)
+    edges = cv2.Canny(blurred_gray, threshold*0.4, threshold)
 
     # Apply dilation to close gaps in between object edges
     kernel_dilation = np.ones((11, 11), np.uint8)
@@ -64,7 +67,9 @@ def contour_perspective_transform(actual_img, recorded_img):
 
     # Apply Douglas-Peucker algorithm to simplify the contour into a quadrilateral
     epsilon = 0.02 * cv2.arcLength(largest_contour_edge, True)
-    approx_contour = cv2.approxPolyDP(largest_contour_edge, epsilon, True) # shape: (4,1,2)
+    approx_contour = cv2.approxPolyDP(largest_contour_edge, epsilon, True)
+    if approx_contour.shape != (4,1,2):
+        raise Exception("Function failed to find largest contour")
     found_contour = np.reshape(approx_contour, (4,2)).astype(np.float32)
 
     # Use the found contour (corner points) to shift the image
