@@ -1,6 +1,4 @@
-"""
-Utils to read images
-"""
+"""Utils to read images"""
 
 import cv2
 

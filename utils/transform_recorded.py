@@ -29,7 +29,7 @@ def manual_perspective_transform(actual_img, recorded_img, src_points):
 
     return warped_recorded
 
-def contour_perspective_transform(actual_img, recorded_img):
+def contour_perspective_transform(actual_img, recorded_img, manual_threshold = None):
     """
     Transforms a recorded image into the shape of the
     actual image by using OpenCV's contour detection to 
@@ -39,8 +39,10 @@ def contour_perspective_transform(actual_img, recorded_img):
     be the best in notebooks/transform.ipynb.
 
     Parameters:
-        actual_img: cv2 image for actual image (true)
+        actual_img: cv2 image for actual image
         recorded_img: cv2 image for recorded image (from camera)
+        manual_threshold: tuple/arr of (low, high) representing manual threshold
+            override if threshold_otsu doesn't work
     
     Returns:
         transformed_img: cv2 image for projector image cropped out of recorded_img
@@ -50,8 +52,11 @@ def contour_perspective_transform(actual_img, recorded_img):
     # calculating threshold values based on median
     gray_image = cv2.cvtColor(recorded_img, cv2.COLOR_RGB2GRAY)
     blurred_gray = cv2.GaussianBlur(gray_image, (5, 5), 0)
-    threshold = threshold_otsu(blurred_gray)
-    edges = cv2.Canny(blurred_gray, threshold*0.4, threshold)
+    if not manual_threshold:
+        threshold = threshold_otsu(blurred_gray)
+        edges = cv2.Canny(blurred_gray, threshold*0.4, threshold)
+    else:
+        edges = cv2.Canny(blurred_gray, manual_threshold[0], manual_threshold[1])
 
     # Apply dilation to close gaps in between object edges
     kernel_dilation = np.ones((11, 11), np.uint8)
@@ -72,5 +77,40 @@ def contour_perspective_transform(actual_img, recorded_img):
         raise Exception("Function failed to find largest contour")
     found_contour = np.reshape(approx_contour, (4,2)).astype(np.float32)
 
+    # Check and make sure contour runs in clockwise direction
+    found_contour = ensure_clockwise(found_contour)
+
     # Use the found contour (corner points) to shift the image
     return manual_perspective_transform(actual_img, recorded_img, found_contour)
+
+def ensure_clockwise(contour):
+    """
+    Ensure that a contour moves in the
+    clockwise direction as the index
+    increases and that the top left
+    point of the contour is the first
+    item in the returned contour. Works
+    by determining whether to increase/
+    decrease index after top left index
+    is found.
+
+    Parameters:
+        contour: numpy array for a contour of shape (4,2)
+    
+    Returns:
+        clockwise_contour: numpy array for clockwise version of 
+            input contour
+    """
+    direction = -1
+    top_left_idx = np.argmin(np.sum(contour, axis=1))
+    next_idx = (top_left_idx + 1) % 4 # Length of contour is fixed at 4
+    if contour[next_idx][0] > contour[top_left_idx][0]:
+        direction = 1
+
+    i = 0
+    output = np.zeros_like(contour)
+    while i < 4:
+        pt_idx = (top_left_idx + direction*i) % 4
+        output[i] = contour[pt_idx]
+        i += 1
+    return output
