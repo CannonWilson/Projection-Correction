@@ -19,6 +19,7 @@ env/
 
 # macOS
 .DS_Store
+.idea
 
 # Windows
 Thumbs.db

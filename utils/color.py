@@ -17,14 +17,14 @@ def color_correct(src, target):
     Returns:
         corrected_src: numpy array for color corrected version of src image
     """
-    src_int32 = src.astype(np.int32)
-    tar_int32 = target.astype(np.int32)
-    src_r_mean = np.mean(src_int32[:,:,0])
-    src_g_mean = np.mean(src_int32[:,:,1])
-    src_b_mean = np.mean(src_int32[:,:,2])
-    tar_r_mean = np.mean(tar_int32[:,:,0])
-    tar_g_mean = np.mean(tar_int32[:,:,1])
-    tar_b_mean = np.mean(tar_int32[:,:,2])
-    diff_arr = np.array([tar_r_mean-src_r_mean, tar_g_mean-src_g_mean, tar_b_mean-src_b_mean], dtype=np.int32)
-    corrected_src = np.clip(src_int32 + diff_arr, 0, 255)
+    src_float = src.astype(np.float32)
+    tar_float = target.astype(np.float32)
+    
+    src_means = np.mean(src_float, axis=(0, 1))
+    tar_means = np.mean(tar_float, axis=(0, 1))
+    
+    diff_arr = tar_means - src_means
+    
+    corrected_src = np.clip(src_float + diff_arr, 0, 255)
+    
     return corrected_src.astype(np.uint8)
