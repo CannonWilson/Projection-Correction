@@ -2,14 +2,20 @@
 #### Kincannon Wilson, James Wedum, Nithin Weerasinghe
 
 ### Presentation Slides
+[View the presentation slides here!](./ProjCorrPres.pdf)
+
+### Github Repo
+[View the GitHub repo here!](./)
 
 ### Intro
-  The project aims to develop and evaluate methodologies for improving the quality of projected images by adapting to environmental factors such as lighting conditions, surface color, and texture. The goal is to create an application capable of intelligently enhancing projected image quality.
+  Problem: Physical projection image quality is highly dependent on environmental factors. These factors include, but are not limited to: ambient lighting, surface color and texture, vibrations and impacts, and physical placement. These factors can not always be presumed to be static in the environment, for example significant scene changes can effect global illumination, resulting in color and luminosity pertubations. The project aims to develop and evaluate methodologies for improving the quality of projected images by dynamically adapting to environmental factors in order to create an application capable of intelligently enhancing projected image quality.
 
 Current projectors utilize basic color correction algorithms and smooth screens to enhance image quality, but they don't effectively address changing environmental conditions like surface texture or dynamic factors such as moving screens or shifting lighting. Past research often relies on specialized hardware or algorithms, limiting accessibility. Our project proposes a dynamic correction system that adapts to environmental changes using only a camera, projector, and computer connected via HDMI, eliminating the need for specialized hardware like GPUs or constant user input.
 
 ### Methodology (method, data, evaluation metrics). If applicable, highlight how it differs from prior work (new experiments, new methods, etc)
 #### Method
+We developed a reactive-adaptive system that primarily functions using multiple feedback loops in cascade, complemented by a pseudo-feed-forward component. We employ the pseudo-feed-forward mechanism to control optical blur and focus adjustment. This mechanism initially operates based on visual feedback followed by feedback from an encoder to operate a PD (Proportional-Derivative) controller, achieving a steady state after settling. Once in this state, it does not react again unless reactivation is specified by the user, allowing the mechanism to function predominantly as a feed-forward component throughout most of the operation cycle.
+
 - Reactive-Adaptive Control System
   - Feed-forward controller for image shape
   - Feed-back controller for color correction
@@ -21,20 +27,17 @@ Current projectors utilize basic color correction algorithms and smooth screens 
 - Single-sensor, low-cost option
   - Dual-sensor with rotary encoder
 #### Data
-
 For testing purposes, we used 75 frames from *The Wolf of Wall Street (2013)*.
 
 #### Evaluation Metrics
-The team has created one metric for evaluating the effectiveness of various experiments. This metric measures the distance between a recorded image and the actual image. It is calculated by taking the absolute difference between the two images’ intensities and dividing by the maximum possible difference between two images of that size to obtain a result in the range of 0 to 1, inclusive. 
+We propose a single primary evaluation metric for our experiments, the normalized pizel-wise MAE (Mean Absolute Error). The value is the normalized distance between a recorded image and the actual image produced on the computer. We calculate this metric by taking the absolute difference between the two images’ intensities and dividing by the maximum possible difference between two images of that size to obtain a result in the range of 0 to 1, inclusive; with value of 1 suggesting maximum dissimilarity and a value of 0 corresponding to an exact match.
 
-After working on the project, we realized that this may not be the best approach as it does not adaquately take into account image artifacts which is very noticeable for the average viewer. Other prior works have utilized user studies to corroborate their results by having users compare the resulting projection against a control or other techniques. Given the time and resource constraints, we were not able to conduct such trials.
+Upon post-mortem review, we recognized that the single metric may not have been fully sufficient. One weakness is that it is insensitive to image artifacts that would be very noticeable to the average human viewer, leading to certain types of corruption not being properly accounted for. Additionally, prior work often utilized user studies to corroborate their results by having participants compare the resulting projection against a control or other techniques. Given our time and resource constraints, we were not able to conduct such trials.
 
 
 ### Discussion of quantitative results
 [This folder](./results) contains the results of our experiments for the project. We ran an initial test with the projector system with a blue screen that you can see at blue_screen_correction.png. We ran a test on how well the system would respond to an irregular surface in front of the target projection surface at diff_test_results. And finally you can see the graph evaluating the distance metrics generated by the various methods we employed below.
 ![](./results/Results.png)
 ### Demos
-![Demo](./videos/gifs/Demoo.gif)
-![Cropped Demo](./videos/gifs/Demoo_cropped.gif)
-![Short Scene](./videos/gifs/ShortenedScene.gif)
-![Iterative Timelapse](./videos/gifs/iterative_timelapse.gif)
+Here is a demo of the iterative timelapse. More demos can be viewed [here](./videos)
+![](./videos/gifs/iterative_timelapse.gif)
