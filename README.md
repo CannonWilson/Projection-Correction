@@ -32,12 +32,15 @@ The color delta application utilizes a low-pass average filter on a buffer of pe
   - Dual-sensor with rotary encoder
 
 #### Limitations
-There are multiple limitations with the project. First, due to compute resources, we were limited in the number of frames we were able to utilize in our low-pass filter. This reduced its effectiveness by shrinking the time scale being measured. That is, information that would be high-frequency on a longer time scale, such as scene-dependent static elements, may be treated as low-frequency information
+There are multiple limitations with the project. First, due to compute resources, we were limited in the number of frames we were able to utilize in our low-pass filter. This reduced its effectiveness by shrinking the time scale being measured. That is, information that would be high-frequency on a longer time scale, such as scene-dependent static elements, may be treated as low-frequency information because they may be present in all or most of a shorter buffer. This is evident in examples with extreme ghosting.
+
+![](./videos/gifs/buffer.gif)
+
+Multiple steps for individual components may have provided a more stable and well informed approach. Rather than attempting to correct luminosity and color simultaneously, each could have been corrected separately through additional methods. Due to issues with the control system based approach, we pivoted to an iterative method for color correction which showed much better results when compared to a small buffer.
 
 #### Data
-For testing purposes, we used 75 frames from *The Wolf of Wall Street (2013)*.
-![](./test_frames/output_13.png) ![](./test_frames/output_13.png) ![](./test_frames/output_13.png)
-![](./test_frames/output_13.png) ![](./test_frames/output_13.png) ![](./test_frames/output_13.png)
+For testing purposes, we used 75 frames from *The Wolf of Wall Street (2013)*. Here are a few sample frames from the data set.
+![](./test_frames/output_13.png) ![](./test_frames/output_46.png) ![](./test_frames/output_26.png)
 
 #### Evaluation Metrics
 We propose a single primary evaluation metric for our experiments, the normalized pixel-wise MAE (Mean Absolute Error). The value is the normalized distance between a recorded image and the actual image produced on the computer. We calculate this metric by taking the absolute difference between the two images’ intensities and dividing by the maximum possible difference between two images of that size to obtain a result in the range of 0 to 1, inclusive; with value of 1 suggesting maximum dissimilarity and a value of 0 corresponding to an exact match.
@@ -54,3 +57,6 @@ The iterative approach gave the best result, but upon closer inspection, the res
 Here is a demo of the iterative timelapse. More demos can be viewed [here](./videos)
 
 ![](./videos/gifs/iterative_timelapse.gif)
+
+Our correction method on a static blue screen:
+![](./results/blue_screen_correction.png)
