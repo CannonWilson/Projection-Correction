@@ -4,9 +4,6 @@
 ### Presentation Slides
 [View the presentation slides here!](./ProjCorrPres.pdf)
 
-### Github Repo
-[View the GitHub repo here!](./)
-
 ### Introduction
 Problem: Physical projection image quality is highly dependent on environmental factors. These factors include, but are not limited to: ambient lighting, surface color and texture, vibrations and impacts, and physical placement. These factors cannot always be presumed to be static in the environment; for example, significant scene changes can affect global illumination, resulting in color and luminosity perturbations. The project aims to develop and evaluate methodologies for improving the quality of projected images by dynamically adapting to environmental factors to create an application capable of intelligently enhancing projected image quality.
 
@@ -45,7 +42,7 @@ Upon post-mortem review, we recognized that the single metric may not have been 
 The iterative approach provided the best results based on our evaluation metric. However, upon inspection of the outputs, it is clear that the results contain significant visual artifacts. This suggests that alternative and/or additional evaluation metrics should be considered moving forward, including perceptual quality metrics such as Structural Similarity Index (SSI), Peak Signal-to-Noise Ratio (PSNR), or Visual Information Fidelity (VIF); and temporal consitency metrics such as Temporal Structural Similarity Index (TSSI) or Temporal Average Gradient (TAG).
 
 ### Demos
-Here is a demo of the iterative timelapse. More demos can be viewed [here](./videos)
+Here is a demo of the iterative timelapse. More demos can be viewed in the GitHub repo (link at the top of the page).
 
 ![](./videos/gifs/iterative_timelapse.gif)
 
