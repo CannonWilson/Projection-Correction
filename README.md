@@ -18,7 +18,7 @@ We developed a reactive-adaptive system that primarily functions using multiple 
 
 ![](./ctrlFig.png)
 
-The color delta application utilizes a low-pass average filter on a buffer of per-frame pixel-wise color deltas. This is calculated from individual captured frames. We expect some level of ghosting, based on the buffer size. That is, there may be an after-image from portions of the scene that are in-frame for extended periods of time. Character and scene transitions are our high-frequency portion of the data. Given some window, a number on non-static elements are expected in the image due to motion and scene change. The low-pass filter seeks to attenuate this information by averaging together many distinctly different frame deltas. This should result in primarily low-frequecny information regarding color and luminosity to be retained in the filter, such as those resulting from the pysical characteristics of the projection space.
+The color delta application utilizes a low-pass average filter on a buffer of per-frame pixel-wise color deltas. This is calculated from individual captured frames. We expect some level of ghosting, based on the buffer size. That is, there may be an after-image from portions of the scene that are in-frame for some period of time based on parameters such as buffer size and capture rate. Character and scene transitions are our high-frequency portion of the data. Given some window, a number on non-static elements are expected in the image due to motion and scene change. The low-pass filter seeks to attenuate this information by averaging together many distinctly different frame deltas. This should result in primarily low-frequecny information regarding color and luminosity to be retained in the filter, such as those resulting from the pysical characteristics of the projection space. This method of smoothing should prevent flickering resulting from frame-by-frame color and luminosity correction.
 
 - Reactive-Adaptive Control System
   - Feed-forward controller for image shape
@@ -32,9 +32,12 @@ The color delta application utilizes a low-pass average filter on a buffer of pe
   - Dual-sensor with rotary encoder
 
 #### Limitations
+There are multiple limitations with the project. First, due to compute resources, we were limited in the number of frames we were able to utilize in our low-pass filter. This reduced its effectiveness by shrinking the time scale being measured. That is, information that would be high-frequency on a longer time scale, such as scene-dependent static elements, may be treated as low-frequency information
 
 #### Data
 For testing purposes, we used 75 frames from *The Wolf of Wall Street (2013)*.
+![](./test_frames/outpu_13.png) ![](./test_frames/outpu_13.png) ![](./test_frames/outpu_13.png)
+![](./test_frames/outpu_13.png) ![](./test_frames/outpu_13.png) ![](./test_frames/outpu_13.png)
 
 #### Evaluation Metrics
 We propose a single primary evaluation metric for our experiments, the normalized pixel-wise MAE (Mean Absolute Error). The value is the normalized distance between a recorded image and the actual image produced on the computer. We calculate this metric by taking the absolute difference between the two images’ intensities and dividing by the maximum possible difference between two images of that size to obtain a result in the range of 0 to 1, inclusive; with value of 1 suggesting maximum dissimilarity and a value of 0 corresponding to an exact match.
