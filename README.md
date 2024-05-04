@@ -9,7 +9,7 @@ Problem: Physical projection image quality is highly dependent on environmental 
 
 Current projectors utilize basic color correction algorithms and smooth screens to enhance image quality, but they don't effectively address changing environmental conditions like surface texture or dynamic factors such as moving screens or shifting lighting. Past research often relies on specialized hardware or algorithms, limiting accessibility. Our project proposes a dynamic correction system that adapts to environmental changes using only a camera, projector, and computer connected via HDMI, eliminating the need for specialized hardware like GPUs or constant user input.
 
-### Methodology (method, data, evaluation metrics). If applicable, highlight how it differs from prior work (new experiments, new methods, etc)
+### Methodology
 #### Method
 We developed a reactive-adaptive system that primarily functions using multiple feedback loops in cascade, complemented by a pseudo-feed-forward component. The feed-forward component consists of two functions: the calculation and application of a homography matrix to correct for sheer, and a low-pass filter for determining a color delta. We employ the pseudo-feed-forward mechanism to control optical blur and focus adjustment. This mechanism initially operates based on visual feedback followed by feedback from an encoder to operate a PD (Proportional-Derivative) controller, achieving a steady state after settling. Once in this state, it does not react again unless reactivation is specified by the user, allowing the mechanism to function predominantly as a feed-forward component throughout most of the operation cycle.
 
