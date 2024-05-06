@@ -49,7 +49,7 @@ Here is a demo of the iterative timelapse. More demos can be viewed in the GitHu
 Our correction method on a static blue screen:
 ![](./results/blue_screen_correction.png)
 
-###References
+### References
 The Wolf of Wall Street (2013)
 Detecting Good Surface for Improvisatory Visual Projection: https://ieeexplore.ieee.org/abstract/document/8241589
 A real-time interactive system of surface reconstruction and dynamic projection mapping with RGB-depth sensor and projector: https://journals.sagepub.com/doi/full/10.1177/1550147718790853
