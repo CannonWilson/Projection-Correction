@@ -51,7 +51,12 @@ Our correction method on a static blue screen:
 
 ### References
 The Wolf of Wall Street (2013)
+
 Detecting Good Surface for Improvisatory Visual Projection: https://ieeexplore.ieee.org/abstract/document/8241589
+
 A real-time interactive system of surface reconstruction and dynamic projection mapping with RGB-depth sensor and projector: https://journals.sagepub.com/doi/full/10.1177/1550147718790853
+
 Perceptual visual quality metrics: A survey: https://www.sciencedirect.com/science/article/abs/pii/S1047320311000204
+
 Real Time Adaptive Radiometric Compensation: https://src.acm.org/binaries/content/assets/src/2007/anselm-grundhoefer.pdf
+
